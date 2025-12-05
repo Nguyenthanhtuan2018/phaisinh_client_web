@@ -1,5 +1,5 @@
 import { ref } from 'vue';
-import type { WaveAnalysisResult, WavePoint } from '@waves/shared';
+import type { WaveAnalysisResult, WavePoint } from '@/types';
 
 export interface WaveVariables {
   // Main points coordinates

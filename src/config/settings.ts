@@ -1,5 +1,5 @@
 // API & Socket settings
-export const REFRESH_API_URL = 'https://spwapidatafeed.vps.com.vn/getpschartintraday/VN30F1M';
+export const REFRESH_API_URL = 'https://spwapidatafeed.vps.com.vn/getpschartintraday/VN30F2512';
 export const SOCKET_URL = 'https://bgdatafeed.vps.com.vn';
 export const SOCKET_PATH = '/socket.io';
 export const CHANNEL_NAME = 'stockps';

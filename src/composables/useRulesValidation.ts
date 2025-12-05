@@ -1,128 +1,77 @@
 import { ref, computed } from 'vue';
-import type { WaveAnalysisResult, WaveRule, RuleValidationResult, RuleStep } from '@waves/shared';
+import type { WaveAnalysisResult, WaveRule, RuleValidationResult, RuleStep } from '@/types';
+import { waveProfiles } from '@/config/settings';
+
+interface RatioRange {
+  min: number;
+  max: number;
+}
 
 export function useRulesValidation() {
   const currentRule = ref<WaveRule>('rule_10');
   const validationResult = ref<RuleValidationResult | null>(null);
 
-  function validateRule10(result: WaveAnalysisResult): RuleValidationResult {
-    const steps: RuleStep[] = [];
-    const main = result.main;
-    
-    if (!main) {
-      return { rule: 'rule_10', passed: false, steps: [{ name: 'No data', passed: false }] };
-    }
-
-    const { segments, directionMain } = main;
-
-    // Step 1: BC > AB
-    const step1 = {
-      name: 'BC > AB',
-      passed: (segments.BC ?? 0) > (segments.AB ?? 0),
-      details: [`BC = ${segments.BC?.toFixed(2) ?? 'N/A'}`, `AB = ${segments.AB?.toFixed(2) ?? 'N/A'}`]
-    };
-    steps.push(step1);
-
-    // Step 2: DE > CD
-    const step2 = {
-      name: 'DE > CD',
-      passed: (segments.DE ?? 0) > (segments.CD ?? 0),
-      details: [`DE = ${segments.DE?.toFixed(2) ?? 'N/A'}`, `CD = ${segments.CD?.toFixed(2) ?? 'N/A'}`]
-    };
-    steps.push(step2);
-
-    // Step 3: FG > EF
-    const step3 = {
-      name: 'FG > EF',
-      passed: (segments.FG ?? 0) > (segments.EF ?? 0),
-      details: [`FG = ${segments.FG?.toFixed(2) ?? 'N/A'}`, `EF = ${segments.EF?.toFixed(2) ?? 'N/A'}`]
-    };
-    steps.push(step3);
-
-    const passed = steps.every(s => s.passed);
-    return { rule: 'rule_10', passed, steps };
+  function pct(numer: number | undefined, denom: number | undefined): number | null {
+    if (numer == null || denom == null || denom === 0) return null;
+    return (numer / denom) * 100;
   }
 
-  function validateRule11(result: WaveAnalysisResult): RuleValidationResult {
+  function checkRatio(value: number | null, range: RatioRange | undefined): { passed: boolean; value: number | null } {
+    if (value == null || !range) return { passed: false, value: null };
+    const rounded = Number(value.toFixed(2));
+    const passed = rounded >= range.min && rounded <= range.max;
+    return { passed, value: rounded };
+  }
+
+  function validateWithProfile(result: WaveAnalysisResult, rule: WaveRule): RuleValidationResult {
     const steps: RuleStep[] = [];
     const main = result.main;
-    
-    if (!main) {
-      return { rule: 'rule_11', passed: false, steps: [{ name: 'No data', passed: false }] };
+    const profile = waveProfiles[rule];
+
+    if (!main || !profile) {
+      return { rule, passed: false, steps: [{ name: 'No data', passed: false }] };
     }
 
     const { segments } = main;
 
-    // Step 1: BC > AB
-    const step1 = {
-      name: 'BC > AB',
-      passed: (segments.BC ?? 0) > (segments.AB ?? 0),
-      details: [`BC = ${segments.BC?.toFixed(2) ?? 'N/A'}`, `AB = ${segments.AB?.toFixed(2) ?? 'N/A'}`]
+    // Calculate all ratios
+    const ratios = {
+      ratioBCOverAB: pct(segments.BC, segments.AB),
+      ratioDEOverCD: pct(segments.DE, segments.CD),
+      ratioFGOverEF: pct(segments.FG, segments.EF),
+      ratioEFOverDE: pct(segments.EF, segments.DE),
+      ratioCDOverBC: pct(segments.CD, segments.BC),
+      ratioDEOverBC: pct(segments.DE, segments.BC),
+      ratioFGOverDE: pct(segments.FG, segments.DE),
+      ratioFGOverBC: pct(segments.FG, segments.BC)
     };
-    steps.push(step1);
 
-    // Step 2: DE > BC
-    const step2 = {
-      name: 'DE > BC',
-      passed: (segments.DE ?? 0) > (segments.BC ?? 0),
-      details: [`DE = ${segments.DE?.toFixed(2) ?? 'N/A'}`, `BC = ${segments.BC?.toFixed(2) ?? 'N/A'}`]
-    };
-    steps.push(step2);
-
-    // Step 3: FG > DE
-    const step3 = {
-      name: 'FG > DE',
-      passed: (segments.FG ?? 0) > (segments.DE ?? 0),
-      details: [`FG = ${segments.FG?.toFixed(2) ?? 'N/A'}`, `DE = ${segments.DE?.toFixed(2) ?? 'N/A'}`]
-    };
-    steps.push(step3);
-
-    const passed = steps.every(s => s.passed);
-    return { rule: 'rule_11', passed, steps };
-  }
-
-  function validateRule11Plus(result: WaveAnalysisResult): RuleValidationResult {
-    const steps: RuleStep[] = [];
-    const main = result.main;
+    // Check each ratio against profile
+    const ratioKeys = Object.keys(profile) as Array<keyof typeof profile>;
     
-    if (!main) {
-      return { rule: 'rule_11_3nen', passed: false, steps: [{ name: 'No data', passed: false }] };
+    for (const key of ratioKeys) {
+      const range = profile[key];
+      const value = ratios[key as keyof typeof ratios];
+      const check = checkRatio(value, range);
+      
+      const displayName = key
+        .replace('ratio', '')
+        .replace('Over', ' / ')
+        .replace(/([A-Z])/g, ' $1')
+        .trim();
+
+      steps.push({
+        name: displayName,
+        passed: check.passed,
+        details: [
+          `Value: ${check.value?.toFixed(2) ?? 'N/A'}%`,
+          `Range: ${range.min} - ${range.max}%`
+        ]
+      });
     }
 
-    const { segments, points } = main;
-
-    // Rule 11 base checks
-    const step1 = {
-      name: 'BC > AB',
-      passed: (segments.BC ?? 0) > (segments.AB ?? 0),
-      details: [`BC = ${segments.BC?.toFixed(2) ?? 'N/A'}`, `AB = ${segments.AB?.toFixed(2) ?? 'N/A'}`]
-    };
-    steps.push(step1);
-
-    const step2 = {
-      name: 'DE > BC',
-      passed: (segments.DE ?? 0) > (segments.BC ?? 0),
-      details: [`DE = ${segments.DE?.toFixed(2) ?? 'N/A'}`, `BC = ${segments.BC?.toFixed(2) ?? 'N/A'}`]
-    };
-    steps.push(step2);
-
-    const step3 = {
-      name: 'FG > DE',
-      passed: (segments.FG ?? 0) > (segments.DE ?? 0),
-      details: [`FG = ${segments.FG?.toFixed(2) ?? 'N/A'}`, `DE = ${segments.DE?.toFixed(2) ?? 'N/A'}`]
-    };
-    steps.push(step3);
-
-    // Additional 3-candle check (simplified)
-    const step4 = {
-      name: '3 nến liên tiếp',
-      passed: points.B !== null && points.C !== null && points.D !== null,
-      details: ['Kiểm tra 3 nến liên tiếp trong pattern']
-    };
-    steps.push(step4);
-
     const passed = steps.every(s => s.passed);
-    return { rule: 'rule_11_3nen', passed, steps };
+    return { rule, passed, steps };
   }
 
   function validate(result: WaveAnalysisResult | null) {
@@ -131,17 +80,7 @@ export function useRulesValidation() {
       return;
     }
 
-    switch (currentRule.value) {
-      case 'rule_10':
-        validationResult.value = validateRule10(result);
-        break;
-      case 'rule_11':
-        validationResult.value = validateRule11(result);
-        break;
-      case 'rule_11_3nen':
-        validationResult.value = validateRule11Plus(result);
-        break;
-    }
+    validationResult.value = validateWithProfile(result, currentRule.value);
   }
 
   function setRule(rule: WaveRule) {
@@ -150,7 +89,7 @@ export function useRulesValidation() {
 
   const statusText = computed(() => {
     if (!validationResult.value) return 'INDETERMINATE';
-    return validationResult.value.passed ? 'VALID' : 'INVALID';
+    return validationResult.value.passed ? 'ĐẠT' : 'KHÔNG ĐẠT';
   });
 
   const statusClass = computed(() => {

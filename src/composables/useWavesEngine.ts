@@ -1,5 +1,5 @@
 import { ref, watch } from 'vue';
-import type { WavePoint, WaveDirection, WaveAnalysisResult, WaveResult, PrimeWaveResult } from '@waves/shared';
+import type { WavePoint, WaveDirection, WaveAnalysisResult, WaveResult, PrimeWaveResult } from '@/types';
 
 export function useWavesEngine() {
   const result = ref<WaveAnalysisResult | null>(null);

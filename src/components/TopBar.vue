@@ -70,7 +70,7 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue';
 import { useChartStore } from '@/stores/chart';
-import type { WaveRule } from '@waves/shared';
+import type { WaveRule } from '@/types';
 
 const chartStore = useChartStore();
 

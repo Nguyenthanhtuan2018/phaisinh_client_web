@@ -9,7 +9,6 @@
     "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --fix --ignore-path .gitignore"
   },
   "dependencies": {
-    "@waves/shared": "*",
     "axios": "^1.6.5",
     "lightweight-charts": "^4.1.1",
     "pinia": "^2.1.7",

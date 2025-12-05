@@ -1,5 +1,5 @@
 import { ref } from 'vue';
-import type { WavePoint } from '@waves/shared';
+import type { WavePoint } from '@/types';
 import type { IChartApi } from 'lightweight-charts';
 
 export function useWavesStop() {

@@ -1,6 +1,6 @@
 import { ref } from 'vue';
 import { LineStyle, type IChartApi, type ISeriesApi, type Time, type IPriceLine } from 'lightweight-charts';
-import type { WaveAnalysisResult, WavePoint, WaveDirection } from '@waves/shared';
+import type { WaveAnalysisResult, WavePoint, WaveDirection } from '@/types';
 import { colors } from '@/config/settings';
 
 // Segment colors
