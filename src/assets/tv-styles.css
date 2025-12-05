@@ -1,0 +1,119 @@
+/* TradingView-style UI */
+.tvbar {
+  position: fixed; top: 0; left: 0; right: 0;
+  height: 40px;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 10px;
+  background: #131722;
+  border-bottom: 1px solid #2d2f36;
+  box-sizing: border-box; z-index: 10000;
+  color: #fff;
+}
+.tvbar .left, .tvbar .right {
+  display: flex; align-items: center; gap: 8px;
+}
+.tvbar .sep-h {
+  width: 1px; height: 22px; background: #2d2f36; border-radius: 1px;
+  margin: 0 6px;
+}
+
+/* Icon buttons */
+.icon-btn {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 28px; height: 28px; border-radius: 8px;
+  background: transparent; border: 1px solid transparent;
+  color: #fff; cursor: pointer; position: relative;
+  transition: background .12s ease, border-color .12s ease;
+}
+.icon-btn:hover { background: #0f0f0f; border-color: #2d2f36; }
+
+/* Select */
+.tv-select {
+  position: relative;
+  display: inline-flex; align-items: center;
+  height: 28px;
+  background: #131722; border: 1px solid #131722;
+  border-radius: 6px; padding: 0 4px;
+}
+.tv-dark-select {
+  appearance: none;
+  background-color: #131722; color: #fff;
+  border: 1px solid #131722; border-radius: 4px;
+  padding: 4px 8px; font: 600 13px/1 system-ui, Arial;
+  cursor: pointer; outline: none;
+  width: 60px; height: 28px;
+  text-align: center;
+  background-image: url("data:image/svg+xml;utf8,<svg fill='white' height='14' viewBox='0 0 24 24' width='14' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/></svg>");
+  background-repeat: no-repeat;
+  background-position: right 6px center;
+  background-size: 14px;
+}
+.tv-dark-select:hover {
+  border-color: #2d2f36;
+}
+
+/* Badge */
+#layerBadge {
+  position: absolute; right: 2px; bottom: 2px;
+  font-size: 10px; padding: 0 3px; border-radius: 4px;
+  background: #22c55e; color: #fff;
+}
+
+/* Left bar */
+.tv-leftbar {
+  position: fixed; top: 40px; left: 0; bottom: 0; width: 44px;
+  background: #131722; border-right: 1px solid #2d2f36;
+  display: flex; flex-direction: column; align-items: center; gap: 8px;
+  padding: 8px 6px; box-sizing: border-box; z-index: 10000;
+}
+.lb-btn {
+  position: relative;
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 32px; height: 32px; border-radius: 8px;
+  background: transparent; border: 1px solid transparent;
+  color: #fff; cursor: pointer;
+  transition: background .12s ease, border-color .12s ease;
+}
+.lb-btn:hover { background: #0f0f0f; border-color: #2d2f36; }
+
+.lb-sep { margin-bottom: 12px; }
+.lb-sep::after {
+  content: ""; position: absolute; left: 50%; transform: translateX(-50%);
+  bottom: -7px; width: 22px; height: 1px; background: #2d2f36;
+}
+
+.lb-badge {
+  position: absolute; right: 2px; bottom: 2px;
+  font-size: 9px; padding: 0 4px; border-radius: 6px;
+  background: #0ea5e9; color: #fff;
+}
+
+/* Popup */
+.tv-menu {
+  position: fixed;
+  min-width: 220px;
+  background: #131722; color: #fff;
+  border: 1px solid #2d2f36;
+  border-radius: 10px;
+  box-shadow: 0 10px 24px rgba(0,0,0,0.35);
+  padding: 6px; z-index: 10001;
+}
+.tv-menu .mi {
+  display: flex; align-items: center; gap: 8px;
+  padding: 8px 10px; border-radius: 8px; cursor: pointer;
+}
+.tv-menu .mi:hover { background: #0f0f0f; }
+
+/* Status pill */
+.status-pill {
+  display: inline-flex; align-items: center; justify-content: center;
+  font: 700 11px/1 system-ui, Arial;
+  padding: 6px 10px; border-radius: 999px;
+  border: 1px solid #2d2f36;
+  min-width: 130px;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+}
+.pill-green { background: #059669; color: #fff; }
+.pill-red { background: #dc2626; color: #fff; }
+.pill-gray { background: #374151; color: #fff; }

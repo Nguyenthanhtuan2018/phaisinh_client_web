@@ -1,0 +1,101 @@
+syntax = "proto3";
+import "google/protobuf/struct.proto";
+
+package market_api;
+
+option java_multiple_files = true;
+option java_package = "jp.co.okasan.proto.model";
+
+
+message AnyWrapper{
+  string type_url = 1;
+  bytes value = 2;
+}
+
+message LastSale{
+  string marketCd = 1;         // Mã sàn: 100 - HSX, 200 - HNX, 300 - UpCOM, 500 - Phái sinh
+  string secCd = 2;            // Mã chứng khoán
+  double changePoint = 3;      // Giá thay đổi
+  double changePercent = 4;    // % thay đổi
+  double lastPrice = 5;        // Giá khớp cuối
+  double lastQty = 6;          // KL khớp cuối
+  double lastAmt = 7;          // Giá trị khớp
+  double totalQty = 8;         // Tổng KL khớp
+  double totalAmt = 9;         // Tổng GT khớp
+  double hightPrice = 10;      // Giá cao nhất
+  double lowPrice = 11;        // Giá thấp nhất
+  double avgPrice = 12;        // Giá TB
+  NullableString side = 13;    // Side: 1- Bán, 2 - Mua, Rỗng: Không xác định
+  STOCK_COLOR_CODE colorCode = 14;       // Mã màu (tăng, giảm, TC)
+  int32 matTime = 15;
+}
+
+// Message streaming thay doi thông tin index
+message IndexUpdate{
+  int32 indexCd = 1;      // Mã chỉ số index
+  double index = 2;       // Giá trị index
+  double changeIndex = 3; // Giá trị thay đổi
+  int32 totalTrade = 4;   // Tổng giao dịch
+  double totalQty = 5;    // Tổng KL
+  double totalAmt = 6;    // Tổng GT
+  double openIndex = 7;   // GT Index đầu ngày
+  double highIndex = 8;   // Cao nhất
+  double lowIndex = 9;    // Thấp nhất
+  int32 advances = 10;    // Số mã tăng
+  int32 noChange = 11;    // Số không đổi
+  int32 declenes = 12;    // Số mã giảm
+  int32 ceiling = 13;     // Số mã tăng trần
+  int32 floor = 14;       // Số mã giảm sàn
+  INDEX_STATE state = 15;      // Mã màu
+  INDEX_COLOR_CODE colorCode = 16;  // Mã màu (tăng, giảm, TC)
+  double changePercent = 17; // Giá trị thay đổi
+  int64 updTime = 18;
+  enum MSG_TYPE{
+    NONE = 0;
+    NORMAL = 1;
+    TMP = 2;
+  }
+  MSG_TYPE type = 19;
+  double totalQtyPt = 20; // Tổng KL GD thỏa thuận
+  double totalAmtPt = 21; // Tổng GT GD thỏa thuận
+  double matAmt = 22;    // KL khớp
+  double matQty = 23;    // GT khớp
+}
+
+enum INDEX_COLOR_CODE{
+  NONE = 0; // none value
+  OPEN_INDEX = 1; // code open index
+  UP_INDEX = 2; // code index tăng
+  DOWN_INDEX = 3; // code index giảm
+}
+
+enum INDEX_STATE{
+  S = 0; // Trước giờ
+  P = 1; // ATO
+  O = 2; // Liên tục
+  A = 3; // ATC
+  C = 4; // Thỏa thuận
+  I = 5; // Nghỉ trưa
+  K = 6; // Đóng cửa
+  G = 7; // EOD
+  J = 8; // Sau EOD
+  Z = 9; // Đóng cửa
+  B = 10; //dinh ky sau halt
+  H = 11; //halt
+}
+
+message NullableString {
+  oneof kind {
+    google.protobuf.NullValue null = 1;
+    string data = 2;
+  }
+}
+
+enum STOCK_COLOR_CODE{
+  BASIC_PRICE = 0; // code màu tham chiếu
+  CEILING_PRICE = 1; // code màu trần
+  FLOOR_PRICE = 2; // code màu sàn
+  UP_PRICE = 3; // code màu giá tăng
+  DOWN_PRICE = 4; // code màu giá giảm
+  NO_TRADE_PRICE = 5; // code màu không giao dịch
+}
