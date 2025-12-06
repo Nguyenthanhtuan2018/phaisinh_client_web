@@ -187,8 +187,8 @@ onMounted(() => {
     timeScale: { 
       timeVisible: true, 
       secondsVisible: true, 
-      barSpacing: 3,
-      minBarSpacing: 0.5,
+      barSpacing: 2,
+      minBarSpacing: 0.1,
       rightOffset: 5
     }
   });

@@ -69,56 +69,74 @@ export const useChartStore = defineStore('chart', () => {
   };
 
   const mergeData = (payload: { data1s?: Candle[]; data1m?: Candle[]; data5m?: Candle[] }) => {
-    // Process each candle as a tick to aggregate properly
+    // Process each candle - server already aggregated OHLC
     if (payload.data1s) {
-      // Sort by time first to ensure correct open price
+      // Sort by time first
       const sorted = [...payload.data1s].sort((a, b) => a.time - b.time);
       
       for (const c of sorted) {
         if (!c || !Number.isFinite(c.time)) continue;
-        const price = c.close ?? c.open ?? c.high ?? c.low;
-        if (!Number.isFinite(price)) continue;
+        if (!Number.isFinite(c.close)) continue;
         
         // Add timezone offset for display (UTC -> Vietnam time)
         const displayTime = Math.floor(c.time) + timeOffset.value;
         
-        // Aggregate into 1s bucket
+        // Use OHLC from server for 1s candles
         const bucket1s = displayTime;
         let candle1s = candles1s.get(bucket1s);
         if (!candle1s) {
-          candle1s = { time: bucket1s, open: price, high: price, low: price, close: price };
+          candle1s = { 
+            time: bucket1s, 
+            open: c.open ?? c.close, 
+            high: c.high ?? c.close, 
+            low: c.low ?? c.close, 
+            close: c.close 
+          };
           candles1s.set(bucket1s, candle1s);
           data1s.value.push(candle1s);
         } else {
-          if (price > candle1s.high) candle1s.high = price;
-          if (price < candle1s.low) candle1s.low = price;
-          candle1s.close = price;
+          // Merge if same bucket
+          if ((c.high ?? c.close) > candle1s.high) candle1s.high = c.high ?? c.close;
+          if ((c.low ?? c.close) < candle1s.low) candle1s.low = c.low ?? c.close;
+          candle1s.close = c.close;
         }
         
-        // Aggregate into 1m bucket
+        // Aggregate into 1m bucket using OHLC from 1s candle
         const bucket1m = Math.floor(displayTime / 60) * 60;
         let candle1m = candles1m.get(bucket1m);
         if (!candle1m) {
-          candle1m = { time: bucket1m, open: price, high: price, low: price, close: price };
+          candle1m = { 
+            time: bucket1m, 
+            open: c.open ?? c.close, 
+            high: c.high ?? c.close, 
+            low: c.low ?? c.close, 
+            close: c.close 
+          };
           candles1m.set(bucket1m, candle1m);
           data1m.value.push(candle1m);
         } else {
-          if (price > candle1m.high) candle1m.high = price;
-          if (price < candle1m.low) candle1m.low = price;
-          candle1m.close = price;
+          if ((c.high ?? c.close) > candle1m.high) candle1m.high = c.high ?? c.close;
+          if ((c.low ?? c.close) < candle1m.low) candle1m.low = c.low ?? c.close;
+          candle1m.close = c.close;
         }
         
-        // Aggregate into 5m bucket
+        // Aggregate into 5m bucket using OHLC from 1s candle
         const bucket5m = Math.floor(displayTime / 300) * 300;
         let candle5m = candles5m.get(bucket5m);
         if (!candle5m) {
-          candle5m = { time: bucket5m, open: price, high: price, low: price, close: price };
+          candle5m = { 
+            time: bucket5m, 
+            open: c.open ?? c.close, 
+            high: c.high ?? c.close, 
+            low: c.low ?? c.close, 
+            close: c.close 
+          };
           candles5m.set(bucket5m, candle5m);
           data5m.value.push(candle5m);
         } else {
-          if (price > candle5m.high) candle5m.high = price;
-          if (price < candle5m.low) candle5m.low = price;
-          candle5m.close = price;
+          if ((c.high ?? c.close) > candle5m.high) candle5m.high = c.high ?? c.close;
+          if ((c.low ?? c.close) < candle5m.low) candle5m.low = c.low ?? c.close;
+          candle5m.close = c.close;
         }
       }
     }
